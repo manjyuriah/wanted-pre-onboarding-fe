@@ -11,10 +11,10 @@ function Feed(data) {
   const [list, setList] = useState([]); //배열
   const [inputComment, setInputComment] = useState([]); //댓글
   const [commentCount, setCommentCount] = useState(0); //댓글 카운트
-  const [isDisabled, setDisabled] = useState(true); //버튼 활성화
-  const [imgLoad, setImgLoad] = useState(true); //IMG로드
-  const [show, setShow] = useState(false); //내용 더보기
-  const [likeClick, setLikeClick] = useState(false); //내용 더보기
+  const [isDisabled, setIsDisabled] = useState(true); //버튼 활성화
+  const [isImgLoad, setIsImgLoad] = useState(true); //IMG로드
+  const [isShow, setIsShow] = useState(false); //내용 더보기
+  const [isLikeClick, setIsLikeClick] = useState(false); //내용 더보기
   const active = useRef();
   const { image, like, feedId, title, time } = data.list;
 
@@ -23,16 +23,16 @@ function Feed(data) {
     if (e.target.value != '') {
       active.current.style = 'color:#0095f6;font-weight:bold';
       setInputComment([e.target.value]);
-      setDisabled(false);
+      setIsDisabled(false);
     } else {
       active.current.style = 'color:#80c3f0';
-      setDisabled(true);
+      setIsDisabled(true);
     }
   };
   //클릭으로 댓글 업로드
   const uploadComment = (e) => {
     setInputComment('');
-    setDisabled(true);
+    setIsDisabled(true);
     active.current.style = 'color:#80c3f0';
     setCommentCount(commentCount + 1);
   };
@@ -43,25 +43,25 @@ function Feed(data) {
   };
 
   //더보기
-  function fullLength() {
-    setShow((prev) => !prev);
-  }
+  const showFullLength = () => {
+    setIsShow((prev) => !prev);
+  };
   //좋아요
-  function fullHeart() {
-    setLikeClick((prev) => !prev);
-  }
+  const likeFullHeart = () => {
+    setIsLikeClick((prev) => !prev);
+  };
   return (
     <>
       <div
         className="feed-card"
-        style={{ display: imgLoad ? 'none' : 'block' }}
+        style={{ display: isImgLoad ? 'none' : 'block' }}
       >
         <div className="feed-img">
           <img
             className="feed"
             alt="feedImage"
             src={image}
-            onLoad={() => setImgLoad(false)}
+            onLoad={() => setIsImgLoad(false)}
           />
         </div>
         <ul className="banner-btn">
@@ -70,10 +70,10 @@ function Feed(data) {
         </ul>
         <div className="icons">
           <div>
-            {likeClick === false ? (
-              <AiOutlineHeart size={20} onClick={fullHeart} />
+            {isLikeClick === false ? (
+              <AiOutlineHeart size={20} onClick={likeFullHeart} />
             ) : (
-              <AiFillHeart size={20} onClick={fullHeart} />
+              <AiFillHeart size={20} onClick={likeFullHeart} />
             )}
             <BsChat size={18} />
             <FaRegPaperPlane size={18} />
@@ -86,21 +86,21 @@ function Feed(data) {
           <li>좋아요 {like.toLocaleString()} 개</li>
           <li>
             {feedId}
-            {title.length > 8 && show === false ? (
+            {title.length > 8 && isShow === false ? (
               <span> {title.substr(0, 15)}...</span>
             ) : (
               <span> {title}</span>
             )}
-            {show === false ? (
-              <span className="more" onClick={fullLength}>
+            {!isShow && (
+              <span className="more" onClick={showFullLength}>
                 더보기
               </span>
-            ) : null}
+            )}
           </li>
           <li>댓글 {commentCount.toLocaleString()} 개 모두보기</li>
           <li>{time}분 전</li>
         </ul>
-        <form onSubmit={(e) => onSubmit(e)}>
+        <form onSubmit={onSubmit}>
           <div className="comment-box">
             <div className="comment">
               <VscSmiley size={20} className="smile" />
@@ -117,7 +117,7 @@ function Feed(data) {
               type="submit"
               className="upload"
               ref={active}
-              disabled={isDisabled}
+              disabled={setIsDisabled}
               onClick={uploadComment}
             >
               게시
